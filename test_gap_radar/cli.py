@@ -4,7 +4,7 @@ import argparse
 import json
 from dataclasses import asdict
 
-from test_gap_radar.analyzer import analyze
+from test_gap_radar.analyzer import FileRisk, analyze
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -36,7 +36,7 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def print_text(risks) -> None:
+def print_text(risks: list[FileRisk]) -> None:
     if not risks:
         print("No risky missing-test candidates found.")
         return
