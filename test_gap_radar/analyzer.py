@@ -44,7 +44,7 @@ CRITICAL_WORDS = (
     "security",
     "subscription",
 )
-FLAKY_WORDS = ("flaky", "flake", "quarantine", "skip", "xfail", "todo")
+FLAKY_OR_DISABLED_WORDS = ("flaky", "flake", "quarantine", "skip", "xfail")
 COMPLEXITY_PATTERN = re.compile(r"\b(if|for|while|case|catch|except|elif|switch|when)\b|&&|\|\||\?")
 
 
@@ -114,7 +114,9 @@ def score_file(
         reasons.append(f"Changed {change_count} time{'s' if change_count != 1 else ''} in the selected window")
     if bugfix_commits:
         score += min(bugfix_commits, 6) * 10
-        reasons.append(f"{bugfix_commits} bug-fix commit{'s' if bugfix_commits != 1 else ''} mention this file")
+        commit_word = "commits" if bugfix_commits != 1 else "commit"
+        verb = "mention" if bugfix_commits != 1 else "mentions"
+        reasons.append(f"{bugfix_commits} bug-fix {commit_word} {verb} this file")
     if coverage is not None:
         coverage_gap = max(0.0, 100.0 - coverage)
         score += coverage_gap / 4
@@ -312,7 +314,7 @@ def flaky_test_refs(root: Path) -> Counter[str]:
     for relative in test_files(root):
         path = root / relative
         text = path.read_text(encoding="utf-8", errors="ignore")
-        if contains_any(text, FLAKY_WORDS):
+        if contains_any(text, FLAKY_OR_DISABLED_WORDS):
             refs[Path(relative).stem] += 1
     return refs
 

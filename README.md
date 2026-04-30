@@ -26,7 +26,7 @@ Example output:
 Highest-value missing test:
 src/billing/proration.ts
 
-Reason:
+Reasons:
 - Changed 9 times in the selected window
 - 3 bug-fix commits mention this file
 - Current coverage: 22%

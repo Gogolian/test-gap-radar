@@ -45,7 +45,7 @@ def print_text(risks: list[FileRisk]) -> None:
     print("Highest-value missing test:")
     print(highest.path)
     print()
-    print("Reason:")
+    print("Reasons:")
     for reason in highest.reasons:
         print(f"- {reason}")
 
