@@ -45,6 +45,7 @@ CRITICAL_WORDS = (
     "subscription",
 )
 FLAKY_WORDS = ("flaky", "flake", "quarantine", "skip", "xfail", "todo")
+COMPLEXITY_PATTERN = re.compile(r"\b(if|for|while|case|catch|except|elif|switch|when)\b|&&|\|\||\?")
 
 
 @dataclass(slots=True)
@@ -52,7 +53,7 @@ class FileRisk:
     path: str
     score: float
     reasons: list[str] = field(default_factory=list)
-    changed_times: int = 0
+    change_count: int = 0
     bugfix_commits: int = 0
     coverage: float | None = None
     critical: bool = False
@@ -76,7 +77,7 @@ def analyze(args: argparse.Namespace) -> list[FileRisk]:
         score_file(
             root=root,
             relative_path=path,
-            changed_times=changed.get(path, 0),
+            change_count=changed.get(path, 0),
             bugfix_commits=bugfix.get(path, 0),
             coverage=coverage.get(path),
             owner=owners.get(path),
@@ -92,7 +93,7 @@ def analyze(args: argparse.Namespace) -> list[FileRisk]:
 def score_file(
     root: Path,
     relative_path: str,
-    changed_times: int,
+    change_count: int,
     bugfix_commits: int,
     coverage: float | None,
     owner: str | None,
@@ -108,9 +109,9 @@ def score_file(
     score = 0.0
     reasons: list[str] = []
 
-    if changed_times:
-        score += min(changed_times, 12) * 4
-        reasons.append(f"Changed {changed_times} time{'s' if changed_times != 1 else ''} in the selected window")
+    if change_count:
+        score += min(change_count, 12) * 4
+        reasons.append(f"Changed {change_count} time{'s' if change_count != 1 else ''} in the selected window")
     if bugfix_commits:
         score += min(bugfix_commits, 6) * 10
         reasons.append(f"{bugfix_commits} bug-fix commit{'s' if bugfix_commits != 1 else ''} mention this file")
@@ -141,7 +142,7 @@ def score_file(
         path=relative_path,
         score=round(score, 1),
         reasons=reasons,
-        changed_times=changed_times,
+        change_count=change_count,
         bugfix_commits=bugfix_commits,
         coverage=coverage,
         critical=critical,
@@ -289,7 +290,7 @@ def complexity_score(path: Path) -> int:
         text = path.read_text(encoding="utf-8", errors="ignore")
     except OSError:
         return 0
-    branches = len(re.findall(r"\b(if|for|while|case|catch|except|elif|switch|when)\b|&&|\|\||\?", text))
+    branches = len(COMPLEXITY_PATTERN.findall(text))
     loc = len([line for line in text.splitlines() if line.strip()])
     return branches + loc // 80
 

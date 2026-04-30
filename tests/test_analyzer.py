@@ -23,7 +23,7 @@ class AnalyzerTests(unittest.TestCase):
             risk = score_file(
                 root=root,
                 relative_path="src/billing/proration.ts",
-                changed_times=9,
+                change_count=9,
                 bugfix_commits=3,
                 coverage=22,
                 owner="@payments",
