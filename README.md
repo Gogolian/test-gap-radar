@@ -37,5 +37,5 @@ Reason:
 
 ```bash
 python -m pip install -e .
-python -m pytest
+python -m unittest discover -s tests
 ```
