@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "test-gap-radar"
+version = "0.1.0"
+description = "Maps changed production code and incident signals to missing tests."
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.scripts]
+test-gap-radar = "test_gap_radar.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["test_gap_radar*"]
